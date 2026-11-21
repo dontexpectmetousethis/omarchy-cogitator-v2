@@ -25,6 +25,9 @@ See `widget-inventory.md` for the full catalogue and current runtime-use map.
   packaged locally into affected plugins by the installer.
 * `shared/voice/`: Mechanicus interface vocabulary, status litanies and catalogue
   names, applied to presentation bindings without changing backend models.
+* `personas/`: assistant persona sources; `scripts/persona.py` binds them to
+  Hermes Desktop and OpenCode while engaged and restores each app's previous
+  value on disengage. The voice contract is shared with `shared/voice/`.
 * `shared/icons/`: native vector bar identity icons with functional states,
   locally packaged into the affected plugins.
 * `scripts/`: lifecycle and import tooling; `tests/`: regression checks.

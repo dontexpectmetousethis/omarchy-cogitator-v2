@@ -216,6 +216,12 @@ Ui.Panel {
                         }
                         Text {
                             width: parent.width; wrapMode: Text.WordWrap
+                            visible: text !== ""
+                            text: root.reported.personas && root.reported.personas.summary ? "Voice binding: " + root.reported.personas.summary : ""
+                            color: Color.foreground; font.family: Style.font.family; font.pixelSize: 13
+                        }
+                        Text {
+                            width: parent.width; wrapMode: Text.WordWrap
                             text: root.reported.operation ? root.reported.operation.message || "" : ""
                             color: root.failed ? Color.yellow : Color.foreground
                             font.family: Style.font.family; font.pixelSize: 13
@@ -260,6 +266,7 @@ Ui.Panel {
         required property var field
         property bool colorExpanded: false
         spacing: 5
+        visible: !row.field.requires || !!(root.reported.hosts && root.reported.hosts[row.field.requires] === true)
         Text { text: row.field.label; color: Color.foreground; font.family: Style.font.family; font.pixelSize: 13 }
         Controls.CheckBox {
             visible: row.field.type === "boolean"
@@ -314,6 +321,14 @@ Ui.Panel {
                 onReleased: function(value) { root.setValue(row.field.key, Number(value.toFixed(2))) }
             }
             Text { text: Number(root.draft[row.field.key] || 0).toFixed(row.field.step === 1 ? 0 : 2); color: Color.accent; font.family: Style.font.family; font.pixelSize: 13 }
+        }
+        Controls.TextField {
+            visible: row.field.type === "text"
+            width: parent.width
+            placeholderText: row.field.placeholder || ""
+            text: String(root.draft[row.field.key] || "")
+            enabled: !root.busy
+            onTextEdited: root.setValue(row.field.key, text)
         }
         Row {
             visible: row.field.type === "color"

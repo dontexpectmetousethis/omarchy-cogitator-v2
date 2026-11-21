@@ -102,3 +102,17 @@ COGITATOR_PROP_POSITION="right"
 
 # COGITATOR_PROP_OPACITY: panel fill opacity, 0.4-1.0.
 COGITATOR_PROP_OPACITY=0.92
+
+# --- Assistant voice binding ---------------------------------------------------
+# While Cogitator is engaged, supported assistant applications wear the bundled
+# Grim-Dark 40k persona. Disengaging restores whatever each app used before.
+# Toggling any of these in the control panel applies immediately, in both
+# directions. Sources: personas/grim-dark-40k.md + shared/voice/persona-contract.md
+PERSONA_BINDING=true
+
+# PERSONA_HERMES: sets display.personality through `hermes config` only.
+PERSONA_HERMES=true
+
+# PERSONA_OPENCODE: adds an instructions entry to ~/.config/opencode/opencode.json.
+# Instructions are appended to the system prompt; OpenCode keeps its base prompt.
+PERSONA_OPENCODE=true

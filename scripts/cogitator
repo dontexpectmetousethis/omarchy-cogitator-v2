@@ -43,6 +43,7 @@ readonly BACKUP_ROOT="$STATE_DIR/backups"
 readonly PLUGIN_DST="$HOME/.config/omarchy/plugins/$PLUGIN_ID"
 readonly THEME_DST="$HOME/.config/omarchy/themes/$THEME_SLUG"
 readonly SHELL_JSON="$HOME/.config/omarchy/shell.json"
+readonly PERSONA_SCRIPT="$SOURCE_DIR/scripts/persona.py"
 
 fail() { printf 'cogitator: %s\n' "$*" >&2; exit 1; }
 
@@ -638,6 +639,9 @@ cmd_enable() {
     printf 'Snapshot armed. Previous theme: %s\n' "${current:-unknown}"
   fi
   prepare_config
+  # Save each app's current personality, then wear the Grim-Dark 40k persona.
+  python3 "$PERSONA_SCRIPT" sync engaged \
+    || printf 'cogitator: persona binding skipped; continuing.\n' >&2
   # Capture plugin state before native installation mutates shell.json.
   python3 "$SOURCE_DIR/scripts/cogitator-suite.py" prepare --with-rite
   omarchy plugin validate "$SOURCE_DIR" >/dev/null
@@ -685,6 +689,9 @@ repair_menus_to_stock() {
 
 cmd_disable() {
   local previous previous_bg
+  # Restore every bound assistant before the theme transition.
+  python3 "$PERSONA_SCRIPT" sync disengaged \
+    || printf 'cogitator: persona restore skipped; continuing.\n' >&2
   if [[ ! -f $SNAPSHOT ]]; then
     if [[ -f $STATE_DIR/suite.json ]]; then
       python3 "$SOURCE_DIR/scripts/cogitator-suite.py" disable
@@ -763,18 +770,23 @@ cmd_apply() {
 # plugin source, rescan or restart the shell merely to update a setting.
 cmd_settings_apply() {
   render_config_json
-  if [[ ! -f $SNAPSHOT && ! -f $STATE_DIR/suite.json ]]; then
-    printf 'Settings saved for the next engagement.\n'
-    return
-  fi
-  local key crt=false corners=false
-  if (( $# == 0 )); then crt=true; corners=true; fi
+  local key crt=false corners=false personas=false
+  if (( $# == 0 )); then crt=true; corners=true; personas=true; fi
   for key in "$@"; do
     case "$key" in
       CRT_GLOBAL|CRT_INTENSITY) crt=true ;;
       WINDOW_CHAMFER|WINDOW_CORNER) corners=true ;;
+      PERSONA_*) personas=true ;;
     esac
   done
+  if [[ ! -f $SNAPSHOT && ! -f $STATE_DIR/suite.json ]]; then
+    # Disengaged: a suspended toggle must not leave an app bound.
+    if $personas; then python3 "$PERSONA_SCRIPT" sync disengaged || true; fi
+    printf 'Settings saved for the next engagement.\n'
+    return
+  fi
+  # Persona toggles take effect immediately, in both directions.
+  if $personas; then python3 "$PERSONA_SCRIPT" sync engaged || true; fi
   if $crt; then render_crt_frag; ensure_crt_snippet; fi
   if $corners; then ensure_window_chamfer; fi
   printf 'Settings applied live; shell kept running.\n'
@@ -797,10 +809,13 @@ cmd_configure() {
 cmd_install() {
   prepare_config
   python3 "$SOURCE_DIR/scripts/control-backend.py" install
+  python3 "$PERSONA_SCRIPT" install || true
   printf 'Cogitator installed; engage from the widget beside the clock.\n'
 }
 
 cmd_uninstall() {
+  # A stale persona binding should not outlive the package.
+  python3 "$PERSONA_SCRIPT" uninstall || true
   if [[ -f $SNAPSHOT ]]; then
     cmd_disable
     printf 'Re-run `cogitator uninstall%s` after the restore completes.\n' "${1:+ $1}"

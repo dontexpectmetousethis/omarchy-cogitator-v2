@@ -10,6 +10,7 @@ check() {
 }
 
 check "manager syntax" bash -n "$ROOT/scripts/cogitator"
+check "persona bridge" python3 "$ROOT/tests/persona.py"
 check "stock plugin baselines" python3 "$ROOT/tests/stock-plugins.py"
 check "suite switching and recovery" python3 "$ROOT/tests/suite.py"
 check "shared frame packaging and QML" python3 "$ROOT/tests/frames.py"
