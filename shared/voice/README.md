@@ -9,6 +9,8 @@ rename of system commands or backend state.
 * `lexicon.json`: labels, prompts, actions, status descriptions and menu vocabulary.
 * `phrases.json`: power/auxiliary-link/archive status litanies.
 * `plugin-names.json`: display names in the native plugin/widget catalogue.
+* `persona-contract.md`: canonical machine-state tokens and bounds shared with the
+  assistant persona. Inert markdown, not compiled or deployed by `voice-style.py`.
 * `scripts/voice-style.py`: presentation-only deployment and QML JS lookup builder.
 * `docs/voice-inventory.json`: source strings with locations and review contexts.
 

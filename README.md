@@ -333,6 +333,40 @@ omarchy-shell cogitator-rite toggleMenu    # themed native root menu
 omarchy-shell cogitator-rite openLauncher  # straight to applications
 ```
 
+## Assistant voice binding
+
+When a supported assistant application is installed, enabling Cogitator also
+switches it to the bundled **Grim-Dark 40k** persona. The previous value is
+saved in `~/.local/state/cogitator-v2/personas.json` before the switch and
+restored on disable. The bridge is `scripts/persona.py`; each application is an
+adapter that skips itself when the app is absent, so Cogitator still enables.
+
+| Application | Write path |
+| --- | --- |
+| Hermes Desktop | `display.personality` via the sanctioned `hermes config` CLI |
+| OpenCode | an `instructions` entry in `~/.config/opencode/opencode.json`, pointing at `~/.config/opencode/personas/grim-dark-40k.md` |
+
+OpenCode receives the persona as *instructions*, which are appended to its own
+base prompt, so it keeps its built-in coding behaviour. Existing `instructions`
+entries are preserved and only the persona entry is removed on disable. The
+adapter edits `opencode.json` only: a commented `opencode.jsonc` is reported and
+left untouched rather than rewritten without its comments.
+
+Toggle the binding from **Cogitator Control → Overview** (bind on engage, plus
+one switch per application) or in `cogitator.conf`. Changes apply immediately in
+both directions: unticking an app while engaged restores it at once, and
+`suspend`/`restore` is identical to what `cogitator disable` does. The same
+``sync engaged|disengaged`` command is used by the CLI, the panel and uninstall,
+so the paths cannot disagree.
+
+The installed prompt renders from two sources so the assistant speaks in the
+same voice as the interface: `personas/grim-dark-40k.md` (persona prose) and
+`shared/voice/persona-contract.md` (house machine-state tokens and bounds). The
+contract's tokens are checked against `lexicon.json` and `phrases.json` so the
+two surfaces cannot drift. `install` writes a missing persona and refreshes an
+older shipped copy but never overwrites a hand-edited one; use
+`scripts/persona.py refresh` to force a re-render.
+
 ## Layout
 
 The repo root is deliberately both a native plugin root and a native
@@ -356,6 +390,7 @@ theme root, so Omarchy's own installers accept it directly:
 * `docs/stock-baseline.json` — imported release and original file hashes
 * `shared/frames/` — common menu-style chamfers, outlines and corner flares
 * `shared/voice/` — Mechanicus labels, prompts, statuses and widget catalogue names
+* `personas/` — assistant persona prose; `scripts/persona.py` binds it to Hermes and OpenCode
 * `shared/icons/` — native industrial bar/state icons, Clipboard data-slate and Clock dial
 * `control/` — persistent Control Sanctum widget and all-settings schema
 

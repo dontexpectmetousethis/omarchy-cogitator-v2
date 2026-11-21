@@ -79,6 +79,11 @@ def validate(values):
             import re
             if value and not re.fullmatch(r"#[0-9a-fA-F]{3}(?:[0-9a-fA-F]{3})?", str(value)):
                 raise ValueError("Custom phosphor must be #RGB or #RRGGBB")
+        elif kind == "text":
+            if not isinstance(value, str):
+                raise ValueError(f"{key}: expected text")
+            if len(value) > 500:
+                raise ValueError(f"{key}: too long")
         result[key] = value
     if result["PALETTE"] == "custom" and not result["CUSTOM_PHOSPHOR"]:
         raise ValueError("Choose a custom phosphor color before selecting the custom palette")
@@ -111,6 +116,8 @@ def settings(raw):
             import re
             if value and not re.fullmatch(r"#[0-9a-fA-F]{3}(?:[0-9a-fA-F]{3})?", str(value)):
                 value = ""
+        elif field["type"] == "text":
+            value = str(value)
         effective[key] = value
     return effective
 
@@ -238,6 +245,43 @@ def uninstall_control():
     receipt.unlink(missing_ok=True)
 
 
+def persona_hosts():
+    return {
+        "hermes": shutil.which("hermes") is not None,
+        "opencode": shutil.which("opencode") is not None,
+    }
+
+
+def persona_state():
+    path = STATE / "personas.json"
+    try:
+        data = json.loads(path.read_text())
+    except (OSError, ValueError):
+        return {}
+    return data.get("targets", {}) if isinstance(data, dict) else {}
+
+
+def persona_summary(parsed, hosts, engaged):
+    def enabled(key):
+        raw = parsed.get(key)
+        return True if raw is None else str(raw).strip().lower() in ("true", "yes", "1", "on")
+
+    if not enabled("PERSONA_BINDING"):
+        return "Voice binding suspended."
+    targets = persona_state()
+    parts = []
+    for app, label in (("hermes", "Hermes"), ("opencode", "OpenCode")):
+        if not hosts.get(app):
+            continue
+        if not enabled(f"PERSONA_{app.upper()}"):
+            parts.append(f"{label}: suspended")
+        elif app in targets:
+            parts.append(f"{label}: bound")
+        else:
+            parts.append(f"{label}: {'not bound' if engaged else 'ready'}")
+    return " · ".join(parts)
+
+
 def status():
     raw = CONF.read_text() if CONF.exists() else (ROOT / "config/cogitator.conf.example").read_text()
     operation = json.loads(OPERATION.read_text()) if OPERATION.exists() else {"phase": "idle"}
@@ -247,8 +291,13 @@ def status():
         operation = {"phase": "failed", "message": "Transition interrupted; retry or inspect transition logs"}
     journal = STATE / "suite.json"
     phase = json.loads(journal.read_text())["phase"] if journal.exists() else "inactive"
+    engaged = (STATE / "snapshot.json").exists() or phase in ("active", "switching")
+    hosts = persona_hosts()
     return {"values": settings(raw), "revision": revision(raw), "schema": SCHEMA,
-            "engaged": (STATE / "snapshot.json").exists() or phase in ("active", "switching"),
+            "engaged": engaged,
+            "hosts": hosts,
+            "personas": {"summary": persona_summary(parse_conf(raw), hosts, engaged),
+                         "targets": persona_state()},
             "busy": busy or operation.get("phase") in ("queued", "running"), "operation": operation,
             "suite": phase}
 

@@ -31,6 +31,16 @@ CRT_ENABLED=true
 # scanlines soften automatically so the two never double up.
 CRT_GLOBAL=true
 
+# CRT_AUTO_VIDEO: while a video is fullscreen, lift the compositor shader
+# so playback is unprocessed, then restore it when you leave fullscreen.
+# Runtime only — your CRT_GLOBAL preference is untouched.
+CRT_AUTO_VIDEO=false
+
+# CRT_AUTO_VIDEO_CLASSES: comma-separated Hyprland window classes treated
+# as video when fullscreen. Empty uses a built-in player/browser list;
+# "*" suspends for any fullscreen window.
+CRT_AUTO_VIDEO_CLASSES=""
+
 # FLICKER: whole-frame breathing flicker strength, 0.0-0.3. 0.05 is a
 # whisper; 0.0 disables. Full animation tier only.
 FLICKER=0.05
@@ -102,3 +112,17 @@ COGITATOR_PROP_POSITION="right"
 
 # COGITATOR_PROP_OPACITY: panel fill opacity, 0.4-1.0.
 COGITATOR_PROP_OPACITY=0.92
+
+# --- Assistant voice binding ---------------------------------------------------
+# While Cogitator is engaged, supported assistant applications wear the bundled
+# Grim-Dark 40k persona. Disengaging restores whatever each app used before.
+# Toggling any of these in the control panel applies immediately, in both
+# directions. Sources: personas/grim-dark-40k.md + shared/voice/persona-contract.md
+PERSONA_BINDING=true
+
+# PERSONA_HERMES: sets display.personality through `hermes config` only.
+PERSONA_HERMES=true
+
+# PERSONA_OPENCODE: adds an instructions entry to ~/.config/opencode/opencode.json.
+# Instructions are appended to the system prompt; OpenCode keeps its base prompt.
+PERSONA_OPENCODE=true

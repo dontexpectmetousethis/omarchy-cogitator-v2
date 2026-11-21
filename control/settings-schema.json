@@ -4,6 +4,8 @@
   {"key":"CRT_GLOBAL","group":"Appearance","label":"Global CRT — all windows","type":"boolean","default":true},
   {"key":"CRT_ENABLED","group":"Appearance","label":"Local CRT — console and launcher","type":"boolean","default":true},
   {"key":"CRT_INTENSITY","group":"Appearance","label":"CRT intensity","type":"number","default":0.25,"min":0,"max":1,"step":0.01},
+  {"key":"CRT_AUTO_VIDEO","group":"Appearance","label":"CRT off during fullscreen video","type":"boolean","default":false},
+  {"key":"CRT_AUTO_VIDEO_CLASSES","group":"Appearance","label":"Fullscreen video classes — comma separated, * for all","type":"text","default":""},
   {"key":"WINDOW_CHAMFER","group":"Appearance","label":"Application window chamfers","type":"boolean","default":true},
   {"key":"WINDOW_CORNER","group":"Appearance","label":"Application corner cut — pixels","type":"number","default":14,"min":0,"max":40,"step":1},
   {"key":"COGITATOR_PROP","group":"Surfaces","label":"Auspex console","type":"boolean","default":true},
@@ -20,5 +22,8 @@
   {"key":"PERSISTENCE","group":"Motion","label":"Sweep persistence","type":"number","default":0.15,"min":0,"max":1,"step":0.01},
   {"key":"GHOSTING","group":"Motion","label":"Sweep ghosting","type":"number","default":0.10,"min":0,"max":1,"step":0.01},
   {"key":"BRIGHTNESS_FALLOFF","group":"Motion","label":"Console edge falloff","type":"boolean","default":true},
-  {"key":"SCREEN_BURN","group":"Motion","label":"SIGMA-IX burn watermark","type":"boolean","default":false}
+  {"key":"SCREEN_BURN","group":"Motion","label":"SIGMA-IX burn watermark","type":"boolean","default":false},
+  {"key":"PERSONA_BINDING","group":"Overview","label":"Bind assistant voices on engage","type":"boolean","default":true},
+  {"key":"PERSONA_HERMES","group":"Overview","label":"Hermes Desktop — Grim-Dark 40k","type":"boolean","default":true,"requires":"hermes"},
+  {"key":"PERSONA_OPENCODE","group":"Overview","label":"OpenCode — Grim-Dark persona","type":"boolean","default":true,"requires":"opencode"}
 ]
